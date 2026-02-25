@@ -3,7 +3,7 @@
 # This script downloads the native binaries required for the Ladybug Julia bindings.
 set -euo pipefail
 
-LBUG_VERSION="0.14.1"
+LBUG_VERSION=$(curl -sS https://api.github.com/repos/LadybugDB/ladybug/releases/latest | grep -o '"tag_name": "v\([^"]*\)"' | cut -d'"' -f4 | cut -c2-)
 RELEASE_URL="https://github.com/LadybugDB/ladybug/releases/download/v${LBUG_VERSION}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
