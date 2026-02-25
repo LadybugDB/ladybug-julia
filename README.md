@@ -56,6 +56,12 @@ end
 - **Result conversion**: Convert query results to Julia matrices or DataFrame-like structures
 - **Resource management**: Automatic cleanup with finalizers and do-block syntax
 
+## Running tests
+
+```
+docker run -v .:/app --rm julia:bookworm julia --project=/app -e 'using Pkg; Pkg.instantiate(); include("/app/test/runtests.jl")'
+```
+
 ## API Overview
 
 ### Database Operations
