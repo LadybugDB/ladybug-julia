@@ -3,16 +3,29 @@
 
 # Helper function for ccall
 macro lbugcall(func, ret_type, arg_types, args...)
+    # Build the ccall expression programmatically
+    ccall_expr = Expr(:call, :ccall)
+    
+    # First argument: (func_name, lib)
+    func_tuple = Expr(:tuple, esc(func), :(LIBLBUG[]))
+    push!(ccall_expr.args, func_tuple)
+    
+    # Second argument: return type
+    push!(ccall_expr.args, esc(ret_type))
+    
+    # Third argument: argument types tuple
+    push!(ccall_expr.args, esc(arg_types))
+    
+    # Remaining arguments: the actual arguments
+    for arg in args
+        push!(ccall_expr.args, esc(arg))
+    end
+    
     quote
-        if LIBLBUG == C_NULL
+        if LIBLBUG[] == C_NULL
             error("Ladybug library not loaded. Run: bash scripts/download-liblbug.sh")
         end
-        ccall(
-            ($(esc(func)), LIBLBUG),
-            $(esc(ret_type)),
-            $(esc(arg_types)),
-            $(esc(args))...
-        )
+        $ccall_expr
     end
 end
 

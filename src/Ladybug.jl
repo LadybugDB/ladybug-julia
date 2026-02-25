@@ -34,6 +34,9 @@ export get_version, get_storage_version
 
 const LBUG_VERSION = "0.14.1"
 
+# Library handle - initialized in __init__
+const LIBLBUG = Ref{Ptr{Cvoid}}(C_NULL)
+
 # Find and load the shared library
 function __init__()
     lib_dir = joinpath(dirname(@__DIR__), "lib")
@@ -58,10 +61,22 @@ function __init__()
         Please run the download script:
         bash scripts/download-liblbug.sh
         """
-        global const LIBLBUG = C_NULL
+        LIBLBUG[] = C_NULL
     else
-        global const LIBLBUG = Libdl.dlopen(lib_path)
-        @info "Loaded Ladybug library from $lib_path"
+        try
+            LIBLBUG[] = Libdl.dlopen(lib_path)
+            @info "Loaded Ladybug library from $lib_path"
+        catch e
+            @warn """
+            Failed to load Ladybug library from $lib_path
+            
+            Error: $e
+            
+            Please ensure the library is compatible with your system.
+            Run: bash scripts/download-liblbug.sh
+            """
+            LIBLBUG[] = C_NULL
+        end
     end
 end
 
